@@ -5,3 +5,4 @@ client = pymongo.MongoClient(url)
 
 db = client['Gudang']
 db_user = client['User']
+
