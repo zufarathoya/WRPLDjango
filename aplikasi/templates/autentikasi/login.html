@@ -9,6 +9,7 @@
 
 <body class="bg-gray-100 h-screen flex items-center justify-center">
     <div class="max-w-md w-full bg-white p-8 rounded shadow-md">
+        <h1 class="text-4xl font-bold mb-8 float-center">Beauty Heaven</h1>
         <h2 class="text-2xl font-bold mb-8">Login</h2>
         <form method="post">
             {% csrf_token %}
@@ -20,7 +21,12 @@
                 <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
                 <input type="password" id="password" name="password" class="border border-gray-400 rounded w-full py-2 px-3">
             </div>
-            <input type="submit" value="Login" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <div class='static'>
+                <a href='{% url "register/" %}' class='inline-block hover:text-blue-600'>belum punya akun? register</a>
+                <div class="inline-block float-right">
+                    <input type="submit" value="Login" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                </div>
+            </div>
         </form>
     </div>
 </body>

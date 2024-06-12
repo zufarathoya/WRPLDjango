@@ -17,3 +17,6 @@ def login_view(request):
             return render(request, 'autentikasi/login.html', {})
     else:
         return render(request, 'autentikasi/login.html', {})
+    
+def pelanggan(request):
+    return render(request, 'pelanggan/base.html', {})

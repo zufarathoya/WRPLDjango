@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import produuct_collection, user_collection
+from .models import product_collection, user_collection
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
@@ -18,14 +18,28 @@ def addProduct(request):
         'stok' : 10,
         'kategori' : 'Skincare' 
     }
-    produuct_collection.insert_one(record)
+    product_collection.insert_one(record)
     return HttpResponse('<h1> Product Added </h1>') 
 
 def showProduct(request):
-    product = produuct_collection.find()
-    # return HttpResponse(product)
-    product_list = list(product)
-    return render(request, 'main/show_product.html', {'products': product_list})
+    # Ambil semua kategori unik dari koleksi produk
+    categories = product_collection.distinct('kategori')
+    categories = dict(categories)
+
+    # Ambil kategori yang dipilih dari permintaan GET
+    selected_category = request.GET.get('kategori', '')
+
+    if selected_category:
+        products = product_collection.find({'kategori': selected_category})
+    else:
+        products = product_collection.find()
+
+    context = {
+        'products': products,
+        'categories': categories,
+        'selected_category': selected_category,
+    }
+    return render(request, 'main/show_product.html', context)
 
 def showUser(request):
     product = user_collection.find()
@@ -53,11 +67,19 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = user_collection.find({'username':username, 'password':password})
-        user = list(user)
+        user = user_collection.find_one({'username':username, 'password':password})
+        user = dict(user)
         print(user)
         if len(user):
-            return redirect(reverse('show/'))
+            if user['category'] == 'pelanggan':
+            # return redirect(reverse('show/'))
+                return redirect(reverse('pelanggan/'))
+            elif user['category'] == 'gudang':
+                return redirect(reverse('gudang/'))
+            elif user['category'] == 'toko':
+                return redirect(reverse('toko/'))
+            elif user['category'] == 'delivery':
+                return redirect(reverse('delivery/'))
         else:
             messages.error(request, 'Username or password is incorrect')
             return render(request, 'autentikasi/login.html', {})
