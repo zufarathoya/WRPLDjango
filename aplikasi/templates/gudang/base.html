@@ -13,11 +13,12 @@
         <div class="w-64 bg-gray-800 text-white p-4 flex-shrink-0">
             <h2 class="text-2xl font-bold mb-4">Beauty Heaven</h2>
             <ul>
-                <li class="mb-2"><a href="" class="block py-2 px-4 hover:bg-gray-700">Home</a></li>
-                <li class="mb-2"><a href="" class="block py-2 px-4 hover:bg-gray-700">Tambah Produk</a></li>
-                <li class="mb-2"><a href="" class="block py-2 px-4 hover:bg-gray-700">Tambah Stok</a></li>
+                <li class="mb-2"><a href="{% url 'gudang_show/' %}" class="block py-2 px-4 hover:bg-gray-700">Lihat Produk</a></li>
+                <li class="mb-2"><a href="{% url 'tambah_produk/' %}" class="block py-2 px-4 hover:bg-gray-700">Tambah Produk</a></li>
+                <li class="mb-2"><a href="{% url 'tambah_stok/' %}" class="block py-2 px-4 hover:bg-gray-700">Tambah Stok</a></li>
                 <li class="mb-2"><a href="" class="block py-2 px-4 hover:bg-gray-700">Kirim Toko</a></li>
             </ul>
+            <a class="bg-red-500 p-2 rounded" href="{% url 'logout/' %}">LogOut</a>
         </div>
         <!-- Content -->
         <div class="flex-1 overflow-y-auto p-4">

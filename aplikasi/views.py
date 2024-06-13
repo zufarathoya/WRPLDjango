@@ -56,12 +56,29 @@ def showUser(request):
 
 def login_view(request):
     if request.method == 'POST':
+        
         username = request.POST['username']
         password = request.POST['password']
         user = user_collection.find_one({'username':username, 'password':password})
         user = dict(user)
         print(user)
         if len(user):
+            user_collection.update_many(
+                {},
+                {
+                    '$set': {
+                        'is_login': False
+                    }
+                }
+            )
+            user_collection.update_one(
+                {'username':username},
+                {
+                    '$set': {
+                        'is_login': True
+                    }
+                }
+            )
             if user['category'] == 'pelanggan':
             # return redirect(reverse('show/'))
                 return redirect(reverse('pelanggan/'))
@@ -101,6 +118,17 @@ def register_view(request):
             return redirect(reverse('login/'))
         
     return render(request, 'autentikasi/register.html', {})
+
+def logout_view(request):
+    user_collection.update_one(
+        {'is_login': True},
+        {
+            '$set': {
+                'is_login': False
+            }
+        }
+    )
+    return redirect(reverse('login/'))
 
 # def buy_product(request):
 #     if request.method == 'POST':

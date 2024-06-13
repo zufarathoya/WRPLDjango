@@ -18,6 +18,7 @@ def cart(request):
         
         # Mencari user berdasarkan username
         user = user_collection.find_one({'username': username})
+        # user = user_collection.find_one({'is_login': True})
         
         if product and user:
             # Ubah _id produk menjadi string untuk keperluan render template
@@ -26,11 +27,11 @@ def cart(request):
             # Hitung harga total untuk produk tertentu
             total_harga_produk = int(product['harga']) * quantity
             
-            coba = cart_collection.find_one({'product_id': ObjectId(product_id)})
+            coba = cart_collection.find_one({'product_id': str(product_id)})
             if coba is None:
                 # Simpan data produk ke dalam koleksi cart_collection
                 cart_collection.insert_one({
-                    'product_id': str(product_id),
+                    'product_id': product_id,
                     'nama': product['nama'],
                     'harga': product['harga'],
                     'kuantitas': quantity,
@@ -80,7 +81,7 @@ def hapus_barang(request):
         user_id = request.POST.get('selected_user_id')
         
         # Hapus barang dari keranjang berdasarkan product_id dan user_id
-        cart_collection.delete_one({'product_id': ObjectId(product_id), 'user_id': user_id})
+        cart_collection.delete_one({'product_id': str(product_id), 'user_id': str(user_id)})
 
     # Tampilkan pesan error jika metode request tidak valid (bukan POST)
     return HttpResponse('Error: Invalid request method.')
