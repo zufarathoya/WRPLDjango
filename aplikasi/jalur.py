@@ -19,19 +19,28 @@ def buy(request):
 
     if selected_category:
         products = product_collection.find({'kategori': selected_category})
-        # products = list(products)
+        products = list(products)
     else:
         products = product_collection.find()
-        # products = list(products)
+        products = list(products)
 
-    # for product in products:
-        # product['id'] = product['_id']
+    for product in products:
+        product['id'] = product['_id']
 
     context = {
         'products': products,
         'categories': categories,
         'selected_category': selected_category,
     }
+    selected_id = request.GET.get('beli', '')
+    if selected_id:
+        product = product_collection.find_one({'_id': ObjectId(selected_id)})
+        product['id'] = product['_id']
+        context = {
+            'product': product,
+            'selected_id': selected_id,
+        }
+        return render(request, 'pelanggan/buy_product.html', context)
     return render(request, 'pelanggan/buy.html', context)
 
 
@@ -44,5 +53,12 @@ def gudang(request):
 def delivery(request):
     return render(request, 'delivery/base.html', {})
 
-def buy_product(request, product_id):
-    return HttpResponse(f"You are purchasing product with ID: {product_id}")
+def buy_product(request):
+    selected_id = request.GET.get('beli', '')
+    product = product_collection.find_one({'_id': ObjectId(selected_id)})
+    product['id'] = product['_id']
+    context = {
+        'product': product,
+        'selected_id': selected_id,
+    }
+    return render(request, 'pelanggan/buy_product.html', context)

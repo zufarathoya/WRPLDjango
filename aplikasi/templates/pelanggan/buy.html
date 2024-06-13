@@ -20,6 +20,8 @@
     </form>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {% for product in products %}
+        <form method="get">
+        <label for="beli" class="block text-sm font-medium text-gray-700">Sort by Category:</label>
         <div class="bg-white shadow-md rounded-lg h-56 overflow-hidden relative">
             <div class="p-2">
                 <h2 class="text-lg font-semibold mb-2">{{ product.nama }}</h2>
@@ -29,13 +31,12 @@
                 <p class="text-gray-700 mb-2">Category: {{ product.kategori }}</p>
             </div>
             <div class="absolute bottom-0 right-0 p-2 py-4">
-                <form method="get">
-                    <a href="{% url 'buy_product/product.id' %}" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
-                        Buy
-                    </a>
-                </form>
+                <button value="{{ product.id }}" name="beli" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
+                    Buy
+                </button>
             </div>
         </div>
+        </form>
         {% endfor %}
     </div>
 </div>

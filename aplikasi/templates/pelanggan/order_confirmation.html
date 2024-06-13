@@ -1,0 +1,21 @@
+{% extends "pelanggan/base.html" %}
+
+{% block title %}Order Confirmation{% endblock %}
+
+{% block content %}
+
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Order Confirmation</h1>
+
+    <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+        <h2 class="text-lg font-semibold mb-2">Thank you for your order!</h2>
+        <p>Your order has been successfully placed.</p>
+        <!-- Tambahkan detail pesanan jika perlu -->
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'buy/' %}" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">Continue Shopping</a>
+    </div>
+</div>
+
+{% endblock %}

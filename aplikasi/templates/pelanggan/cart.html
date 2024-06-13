@@ -1,0 +1,60 @@
+{% extends "pelanggan/base.html" %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block content %}
+
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Shopping Cart</h1>
+
+    {% if product %}
+    <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+        <h2 class="text-lg font-semibold mb-2">Product Details</h2>
+        <p><strong>Name:</strong> {{ product.nama }}</p>
+        <p><strong>Price:</strong> {{ product.harga }}</p>
+        <p><strong>Stock:</strong> {{ product.kuantitas }}</p>
+        <p><strong>Category:</strong> {{ product.kategori }}</p>
+        <p><strong>User ID:</strong> {{ user_id }}</p>
+    </div>
+    {% endif %}
+
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <h2 class="text-lg font-semibold mb-2">Your Cart</h2>
+        <ul>
+            {% for item in daftar %}
+            <li>
+                <strong>Name:</strong> {{ item.nama }}<br>
+                <strong>Price:</strong> {{ item.harga }}<br>
+                <strong>Quantity:</strong> {{ item.kuantitas }}<br>
+                <strong>Category:</strong> {{ item.kategori }}<br>
+                <strong>User ID:</strong> {{ item.user_id }}<br>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="selected_product_id" value="{{ item.id }}">
+                    <input type="hidden" name="selected_user_id" value="{{ item.user_id }}">
+                    <input type="hidden" name="selected_quantity" value="{{ item.kuantitas }}">
+                    <input type="hidden" name="selected_price" value="{{ item.harga }}">
+                    <input type="hidden" name="selected_category" value="{{ item.kategori }}">
+                    <input type="hidden" name="selected_name" value="{{ item.nama }}">
+                    <button type="submit" class="text-red-500">Remove</button>
+                </form>
+            </li>
+            {% empty %}
+            <li>No items in your cart</li>
+            {% endfor %}
+            <p><strong>Total Belanjaan: </strong>{{ total_harga_keranjang }}</p>
+        </ul>
+    </div>
+
+    <div class="mt-4 flex justify-between">
+        <a href="{% url 'buy/' %}" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">Continue Shopping</a>
+        <form action="{% url 'checkout/' %}" method="post">
+            <p type="hidden" name="_user_id" value="{{ item.user_id }}"></p>
+            <p type="hidden" name="total_harga" value="{{ total_harga_keranjang }}"></p>
+            {% csrf_token %}
+            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700">Proceed to Checkout</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

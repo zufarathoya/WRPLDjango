@@ -1,12 +1,12 @@
 from django.urls import path
-from . import views, jalur
+from . import views, jalur, cart, checkout
 
 urlpatterns = [
     path('', views.index),
     path('add/', views.addProduct),
     path('show/', views.showProduct, name='show/'),
     path('showUser/', views.showUser, name='showUser/'),
-    path('login/', views.login_view, name='login'),
+    path('login/', views.login_view, name='login/'),
     path('register/', views.register_view, name='register'),
     path('login_user/', views.login_view, name='login'),
     path('register_user/', views.register_view, name='register/'),
@@ -15,5 +15,11 @@ urlpatterns = [
     path('toko/', jalur.toko, name='toko/'),
     path('gudang/', jalur.gudang, name='gudang/'),
     path('delivery/', jalur.delivery, name='delivery/'),
-    path('buy_product/<int:product_id>/', jalur.buy_product, name='buy-product'),
+    path('buy_product/<str:product_id>/', jalur.buy_product, name='buy_product/'),
+    path('buy_product/', views.buy_product, name='buy_product'),
+    path('cart/', cart.cart, name='cart/'),
+    # path('cart-apa/', cart.cart_view, name='cart/'),
+    path('hapus_barang', cart.hapus_barang, name='hapus_barang/'),
+    path('checkout/', checkout.checkout, name='checkout/'),
+    path('order_confirmation/', checkout.orderConfirmation, name='order_confirmation/'),
 ]
