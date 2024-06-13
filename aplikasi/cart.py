@@ -1,6 +1,6 @@
 from bson import ObjectId
 from django.shortcuts import render, redirect
-from .models import product_collection, user_collection, cart_collection, Product
+from .models import product_collection, user_collection, cart_collection
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
