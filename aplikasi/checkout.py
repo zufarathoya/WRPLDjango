@@ -32,7 +32,7 @@ def checkout(request):
         # cart_items = list(cart_items)
         # for cart_item in cart_items:
         order_history = {
-            'user_id': user_id_,
+            'user_id': str(user_id_),
             'items': cart_items,
             'total_price': sum(item['total_harga_produk'] for item in cart_items),
             # 'total_price' : total_price,
@@ -41,13 +41,13 @@ def checkout(request):
         
         history_purchase.insert_one(order_history)
 
-        order = history_purchase.find_one({'user_id':user_id_})
+        order = history_purchase.find_one({'user_id':str(user_id_)})
         order_id = order['_id']
         
         order_dict = {
             'order_id': str(order_id),
             'user_id': user_id_,
-            'total_price': total_price,
+            'total_price': sum(item['total_harga_produk'] for item in cart_items),
             'order_date': datetime.today(),
         }
 
@@ -80,9 +80,9 @@ def checkout(request):
                 order_id = order_dict['order_id'], 
                 user_id = order_dict['user_id'],
             )
-            return redirect(transaction['redirect_url'])
+            return redirect(reverse('order_confirmation/'))
         
-        create_transaction(request, order_dict)
+        # create_transaction(request, order_dict)
         # Hapus semua produk dari keranjang untuk user yang sedang login
         cart_collection.delete_many({'user_id': str(user_id_)})
 
