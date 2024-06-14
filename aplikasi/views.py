@@ -6,6 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -46,6 +47,7 @@ def showProduct(request):
         'categories': categories,
         'selected_category': selected_category,
     }
+
     return render(request, 'main/show_product.html', context)
 
 def showUser(request):
@@ -54,15 +56,16 @@ def showUser(request):
     product_list = list(product)
     return render(request, 'main/user.html', {'products': product_list})
 
+@csrf_exempt
 def login_view(request):
     if request.method == 'POST':
         
         username = request.POST['username']
         password = request.POST['password']
         user = user_collection.find_one({'username':username, 'password':password})
-        user = dict(user)
-        print(user)
-        if len(user):
+        # log = authenticate(request, username=username, password=password)
+
+        if (user) and username or password:
             user_collection.update_many(
                 {},
                 {
@@ -113,6 +116,7 @@ def register_view(request):
                 'username': username,
                 'password': password1,
                 'category': 'pelanggan',
+                'is_login': False,
             }
             user_collection.insert_one(user)
             return redirect(reverse('login/'))

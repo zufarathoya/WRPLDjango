@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.urls import reverse
 
-def cart(request):
+def add_to_cart(request):
     if request.method == 'POST':
         product_id = request.POST.get('selected_product_id')
         username = request.POST.get('username123')
@@ -58,16 +58,20 @@ def cart(request):
             for item in daftar:
                 total_harga_keranjang += item['total_harga_produk']
 
-            
+            added = True
+            if added:
+                message = 'Product is added to cart'
             context = {
                 'product': product,
                 'user_id': str(user['_id']),
                 'daftar': daftar,
-                'total_harga_keranjang': total_harga_keranjang  # Menambahkan total harga keranjang ke dalam konteks
+                'total_harga_keranjang': total_harga_keranjang,
+                'message': message,
             }
             
             # Render halaman cart.html dengan konteks yang telah dibuat
-            return render(request, 'pelanggan/cart.html', context)
+            return render(request, 'pelanggan/buy_product.html', context)
+            
         else:
             # Tampilkan pesan error jika produk atau user tidak ditemukan
             return HttpResponse('Error: Product or user not found.')
@@ -79,12 +83,38 @@ def hapus_barang(request):
     if request.method == 'POST':
         product_id = request.POST.get('selected_product_id')
         user_id = request.POST.get('selected_user_id')
+        # product_id = request.POST.get('selected_product_id')
+        # user_id = user_collection.find_one({'is_login':True})
         
         # Hapus barang dari keranjang berdasarkan product_id dan user_id
         cart_collection.delete_one({'product_id': str(product_id), 'user_id': str(user_id)})
+        
+        print(f"Product ID: {product_id}")
+        print(f"User ID: {user_id}")
 
+        return redirect(reverse('show_cart/'))
+        
     # Tampilkan pesan error jika metode request tidak valid (bukan POST)
-    return HttpResponse('Error: Invalid request method.')
+    # return HttpResponse('Error: Invalid request method.')
 
-# def cart_view(request):
-#     return redirect(reverse('pelanggan/cart.html'))
+def cart_view(request):
+    # Ambil user yang sedang login
+    user = user_collection.find_one({'is_login': True})
+
+    # Ambil daftar produk dari keranjang untuk user yang sedang login
+    daftar = cart_collection.find({'user_id': str(user['_id'])})
+    daftar = list(daftar)
+
+    total_harga_keranjang = 0
+
+    for item in daftar:
+        total_harga_keranjang += item['total_harga_produk']
+
+    content = {
+        'daftar': daftar,
+        'user_id': str(user['_id']),
+        'total_harga_keranjang': total_harga_keranjang,
+    }
+
+
+    return render(request, 'pelanggan/cart.html', content)

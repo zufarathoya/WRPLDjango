@@ -81,6 +81,12 @@ def tambah_produk(request):
         stok = request.POST.get('stok')
         deskripsi = request.POST.get('deskripsi')
 
+        chek = product_collection.find({'nama':nama})
+        chek = list(chek)
+        if chek:
+            messages.error(request, 'Product already exists.')
+            return redirect(reverse('gudang_show/'))
+
         product = {
             'nama': nama,
             'kategori': kategori,

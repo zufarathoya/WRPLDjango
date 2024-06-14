@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.urls import reverse
 
 def pelanggan(request):
-    return render(request, 'pelanggan/base.html', {})
+    return redirect(reverse('buy/'))
 
 def buy(request):
         # Ambil semua kategori unik dari koleksi produk
