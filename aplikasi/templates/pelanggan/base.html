@@ -17,7 +17,9 @@
                 <li class="mb-2"><a href="{% url 'buy/' %}" class="block py-2 px-4 hover:bg-gray-700">Buy Product</a></li>
                 <li class="mb-2"><a href="" class="block py-2 px-4 hover:bg-gray-700">Show Products</a></li>
                 <li class="mb-2"><a href="{% url 'show_cart/' %}" class="block py-2 px-4 hover:bg-gray-700">Show Cart</a></li>
+                <li class="mb-2"><a href="{% url 'buyer_history/' %}" class="block py-2 px-4 hover:bg-gray-700">History</a></li>
             </ul>
+            <p> {{ user_name }}</p> <br>
             <a href="{% url 'logout/' %}">LogOut</a>
         </div>
         <!-- Content -->

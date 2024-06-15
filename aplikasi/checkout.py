@@ -2,8 +2,8 @@ import uuid
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse
-from .models import cart_collection, product_collection, \
-    history_purchase, user_collection, purchase
+from .models import cart_collection, product_collection, delivery_req, \
+    history_purchase, user_collection, purchase, sales_product, sales_history
 from bson import ObjectId
 from datetime import datetime
 from midtransclient import Snap
@@ -28,11 +28,27 @@ def checkout(request):
             product_id = item['product_id']
             cart_quantity = item['kuantitas']
             
-            product = product_collection.find_one({'_id': ObjectId(product_id)})
+            product = sales_product.find_one({'_id': ObjectId(product_id)})
             if product:
-                
+                sales_id = product['sales_id']
+                item['sales_id'] = sales_id
+
+                sales = {
+                    'sales_id': sales_id,
+                    'product_id': product_id,
+                    'quantity': cart_quantity,
+                    'name': product['nama'],
+                    'price': product['harga'],
+                    'total_price': item['total_harga_produk'],
+                    'user_id': str(user_id_),
+                    'status': 'pending',
+                    'payment_method': 'midtrans',
+                    'order_id': str(uuid.uuid4()),
+                    'order_date': datetime.today()
+                }
+                sales_history.insert_one(sales)
                 new_quantity = int(product['stok']) - cart_quantity
-                product_collection.update_one({'_id': ObjectId(product_id)}, {'$set': {'stok': new_quantity}})
+                sales_product.update_one({'_id': ObjectId(product_id)}, {'$set': {'stok': new_quantity}})
         # cart_items = list(cart_items)
         # for cart_item in cart_items:
         order_history = {
@@ -41,18 +57,30 @@ def checkout(request):
             'total_price': sum(item['total_harga_produk'] for item in cart_items),
             # 'total_price' : total_price,
             'order_date': datetime.today(),
+            'status': 'pending'
+
         }
-        
-        history_purchase.insert_one(order_history)
+
         purchase.insert_one(order_history)
 
         # order = history_purchase.find_one({'user_id':str(user_id_)})
         order = purchase.find_one({'user_id':str(user_id_)})
 
         order_id = order['_id']
-
-        purchase.delete_one({'user_id':str(user_id_)})
+        order_history['order_id'] = order_id
         
+        # sales_history.insert_one(order_history)
+        history_purchase.insert_one(order_history)
+
+        # purchase.delete_one({'user_id':str(user_id_)})
+        delivery_req.insert_one({
+            'user_id': str(user_id_),
+            'order_id': str(order_id),
+            'item': cart_items,
+            'status': 'pending',
+            'date': datetime.today(),
+        })
+
         order_dict = {
             'order_id': str(order_id),
             'user_id': user_id_,

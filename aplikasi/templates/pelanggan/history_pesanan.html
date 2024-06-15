@@ -1,0 +1,48 @@
+{% extends "pelanggan/base.html" %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block content %}
+
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">History</h1>
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <h2 class="text-lg font-semibold mb-2">Your History</h2>
+        <ul>
+            <div class="w-full h-0.5 bg-black"></div>
+            {% for item in daftar %}
+            <li>
+                <div class="w-full h-0.5 bg-black"></div>
+                <!-- <strong>Name:</strong> {{ item.items }}<br> -->
+                <ul>
+                    <li class="pl-7">
+                        {% for barang in item.items %}  
+                        <strong>Name:</strong> {{ barang.nama }}<br>
+                        <strong>Price:</strong> {{ barang.harga }}<br>
+                        <strong>Quantity:</strong> {{ barang.kuantitas }}<br>
+                        <strong>Category:</strong> {{ barang.kategori }}<br>                    
+                        {% endfor %}
+                    </li>
+                </ul>
+                <strong>Total Price:</strong> {{ item.total_price }}<br>
+                <strong>Order Date:</strong> {{ item.order_date }}<br>
+                <!-- <form action="{% url 'remove/' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="selected_product_id" value="{{ item.product_id }}">
+                    <input type="hidden" name="selected_user_id" value="{{ item.user_id }}">
+                    <input type="hidden" name="selected_quantity" value="{{ item.kuantitas }}">
+                    <input type="hidden" name="selected_price" value="{{ item.harga }}">
+                    <input type="hidden" name="selected_category" value="{{ item.kategori }}">
+                    <input type="hidden" name="selected_name" value="{{ item.nama }}">
+                    <button type="submit" class="text-red-500">Remove</button>
+                </form>
+                <div class="w-full h-0.5 bg-black"></div> -->
+            </li>
+            {% empty %}
+            <li>No items in your cart</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

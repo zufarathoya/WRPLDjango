@@ -1,5 +1,5 @@
 from django.db import models
-from db_connection import db, db_user, db_pelanggan, db_buyers, db_bank
+from db_connection import db, db_user, db_pelanggan, db_buyers, db_bank, db_sales, db_supplier, db_delivery
 from django.contrib.auth.models import User
 
 product_collection = db['products']
@@ -9,6 +9,12 @@ history_purchase = db_buyers['historyPurchase']
 TopUpHistory = db_bank['TopUpHistory']
 BankAccount = db_bank['BankAccount']
 purchase = db_pelanggan['purchase']
+history_request = db_sales['historyRequest']
+sales_request = db_sales['request']
+supplier_product = db_supplier['product']
+sales_product = db_sales['product']
+sales_history = db_sales['historySales']
+delivery_req = db_delivery['delivery_request']
 
 # class Product(models.Model):
 #     nama = models.CharField(max_length=100)

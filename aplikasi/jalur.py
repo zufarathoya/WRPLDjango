@@ -1,6 +1,6 @@
 from bson import ObjectId
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import product_collection, user_collection
+from .models import product_collection, user_collection, sales_product, history_purchase
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
@@ -22,16 +22,16 @@ def buy(request):
         return redirect(reverse('login/'))
 
     # Ambil semua kategori unik dari koleksi produk
-    categories = product_collection.distinct('kategori')
+    categories = sales_product.distinct('kategori')
 
     # Ambil kategori yang dipilih dari permintaan GET
     selected_category = request.GET.get('kategori', '')
 
     if selected_category:
-        products = product_collection.find({'kategori': selected_category})
+        products = sales_product.find({'kategori': selected_category})
         products = list(products)
     else:
-        products = product_collection.find()
+        products = sales_product.find()
         products = list(products)
 
     for product in products:
@@ -44,7 +44,7 @@ def buy(request):
     }
     selected_id = request.GET.get('beli', '')
     if selected_id:
-        product = product_collection.find_one({'_id': ObjectId(selected_id)})
+        product = sales_product.find_one({'_id': ObjectId(selected_id)})
         product['id'] = product['_id']
         context = {
             'product': product,
@@ -55,6 +55,10 @@ def buy(request):
 
 
 def toko(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'toko':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
     return render(request, 'toko/base.html', {})
 
 def gudang(request):
@@ -65,6 +69,10 @@ def gudang(request):
     return render(request, 'gudang/base.html', {})
 
 def delivery(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'delivery':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
     return render(request, 'delivery/base.html', {})
 
 def buy_product(request):
@@ -74,10 +82,30 @@ def buy_product(request):
         return redirect(reverse('login/'))
     
     selected_id = request.GET.get('beli', '')
-    product = product_collection.find_one({'_id': ObjectId(selected_id)})
+    product = sales_product.find_one({'_id': ObjectId(selected_id)})
     product['id'] = product['_id']
     context = {
         'product': product,
         'selected_id': selected_id,
     }
     return render(request, 'pelanggan/buy_product.html', context)
+
+def buyer_history(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'pelanggan':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+    
+    daftar = history_purchase.find({'user_id': str(user_log['_id'])})
+    daftar = list(daftar)
+    
+    # total_harga_keranjang = 0
+    # for item in daftar:
+    #     total_harga_keranjang += item['total_harga_produk']
+    
+    context = {
+        'daftar': daftar,
+        # 'total_harga_keranjang': total_harga_keranjang
+    }
+    
+    return render(request, 'pelanggan/history_pesanan.html', context)
