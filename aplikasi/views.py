@@ -24,6 +24,11 @@ def addProduct(request):
     return HttpResponse('<h1> Product Added </h1>') 
 
 def showProduct(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'pelanggan':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+    
     # Ambil semua kategori unik dari koleksi produk
     categories = product_collection.distinct('kategori')
     categories = dict(categories)
