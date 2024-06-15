@@ -10,6 +10,8 @@ def addStock(request):
         messages.error(request, 'You do not have permission to access this page.')
         return redirect(reverse('login/'))
     
+
+    
     if request.method == 'POST':
         selected_id = request.POST.get('selected_product_id')
         stock = int(request.POST.get('stock'))  # Ensure stock is an integer
