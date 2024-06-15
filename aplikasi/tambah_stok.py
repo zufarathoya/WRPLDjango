@@ -5,6 +5,11 @@ from django.contrib import messages
 from django.urls import reverse
 
 def addStock(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'gudang':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+    
     if request.method == 'POST':
         selected_id = request.POST.get('selected_product_id')
         stock = int(request.POST.get('stock'))  # Ensure stock is an integer
@@ -28,6 +33,11 @@ def addStock(request):
     return redirect(reverse('gudang_show/'))
 
 def show_product(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'gudang':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+
     # Get all unique categories from the product collection
     categories = product_collection.distinct('kategori')
 
@@ -53,6 +63,11 @@ def show_product(request):
     return render(request, 'gudang/show_product.html', context)
 
 def show_add_stock(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'gudang':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+    
     products_names = product_collection.distinct('nama')
     products_names = list(products_names)
     selected_product = request.GET.get('product', '')
@@ -74,12 +89,23 @@ def show_add_stock(request):
     return render(request, 'gudang/tambah_stok.html', context)
 
 def tambah_produk(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'gudang':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+
     if request.method == 'POST':
         nama = request.POST.get('nama')
         kategori = request.POST.get('kategori')
         harga = request.POST.get('harga')
         stok = request.POST.get('stok')
         deskripsi = request.POST.get('deskripsi')
+
+        chek = product_collection.find({'nama':nama})
+        chek = list(chek)
+        if chek:
+            messages.error(request, 'Product already exists.')
+            return redirect(reverse('gudang_show/'))
 
         product = {
             'nama': nama,
