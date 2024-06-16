@@ -2,9 +2,10 @@ import datetime
 from bson import ObjectId
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import product_collection, user_collection, sales_request, \
-            history_request, sales_product, supplier_product, delivery_req
+            history_request, sales_product, supplier_product, delivery_req, supplier_product_history
 from django.contrib import messages
 from django.urls import reverse
+from  datetime import datetime
 
 def addStock(request):
     user_log = user_collection.find_one({'is_login':True})
@@ -18,20 +19,71 @@ def addStock(request):
 
         # Find the product based on the ID
         # product = product_collection.find_one({'_id': ObjectId(selected_id)})
-        product = product_collection.find_one({'name': selected_id})
+        product = supplier_product.find_one({'name': selected_id})
 
         if product:
             # Update the product's stock
             # product_collection.update_one({'_id': ObjectId(selected_id)}, {
             #     '$inc': {'stok': stock}
             # })
-            product_collection.update_one({'name': selected_id}, {
+            supplier_product.update_one({'name': selected_id}, {
                 '$inc': {'stok': stock}
+            })
+
+            supplier_product_history.insert_one({
+                'tipe':'Add Stock',
+                'harga':int(product['harga']),
+                'product_id': str(product['_id']),
+                'kuantitas': stock,
+                'nama': product['nama'],
+                'merek': product['merek'],
+                'kategori': product['kategori'],
+                'suplier_id':str(user_log['_id']),
+                'tanggal': datetime.today(),
             })
 
             messages.success(request, 'Stock has been added successfully.')
             return redirect(reverse('gudang_show/'))
 
+    return redirect(reverse('gudang_show/'))
+
+def add_product(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'gudang':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+
+    if request.method == 'POST':
+        quantity = int(request.POST.get('stok'))
+        nama = request.POST.get('nama')
+        merek = request.POST.get('merek')
+        kategori = request.POST.get('kategori')
+        deskripsi = request.POST.get('deskripsi')
+        harga = request.POST.get('harga')
+
+        supplier_product.insert_one({
+            'harga': harga,
+            'stok': quantity,
+            'nama': nama,
+            'merek': merek,
+            'deskripsi': deskripsi,
+            'kategori':kategori,
+            'suplier_id':str(user_log['_id']),
+        })
+
+        supplier_product_history.insert_one({
+            'tipe': 'Add Product',
+            'kuantitas': quantity,
+            'nama': nama,
+            'merek': merek,
+            'kategori': kategori,
+            'tanggal': datetime.today(),
+            'suplier_id':str(user_log['_id']),
+        })
+
+        messages.success(request, 'Request has been sent.')
+        return redirect(reverse('gudang_show/'))
+        
     return redirect(reverse('gudang_show/'))
 
 def show_product(request):
@@ -61,6 +113,22 @@ def show_product(request):
     }
 
     return render(request, 'gudang/show_product.html', context)
+
+def product_history(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'gudang':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+
+    product = supplier_product_history.find({'suplier_id':str(user_log['_id'])})
+    product = list(product)
+    for prod in product:
+        prod['id'] = prod['_id']
+    context = {
+        'items': product,
+    }
+
+    return render(request, 'gudang/product_history.html', context)
 
 def show_add_stock(request):
     user_log = user_collection.find_one({'is_login':True})
@@ -155,25 +223,43 @@ def accept_request(request):
             product_hist = history_request.find_one({'request_id': request_id})
 
             messages.success(request, 'Request has been accepted.')
-            sales_request.delete_one(
-                {'_id': ObjectId(request_id)}
-            )
+            
+            sales_req = sales_request.find_one({'_id': ObjectId(request_id)})
 
             delivery_req.insert_one({
+                'order_id': str(request_id),                
                 'sales_id': product_hist['sales_id'],
                 'suplier_id': product_hist['suplier_id'],
                 'product_id': product_hist['product_id'],
                 'product_name': product_hist['product_name'],
                 'quantity': product_hist['quantity'],
                 'status': 'pending',
-                'date': datetime.datetime.today(),
+                'date': datetime.today(),
             })
 
-            product = sales_product.find_one({'_id':ObjectId(product_hist['product_id'])})
+            deli = delivery_req.find()
+            deli = list(deli)
+
+            product = sales_product.find_one({'_id':ObjectId(sales_req['product_id'])})
+            # product = sales_product.find_one({'_id':ObjectId(request_id)})
             supplier_product.update_one(
                 {'_id': ObjectId(product_hist['product_id'])},
                 {'$inc': {'stok': -product_hist['quantity']}}
             )
+            supplier_product_history.insert_one({
+                'tipe': 'Send to Sales',
+                'product_id': sales_req['product_id'],
+                'kuantitas': sales_req['quantity'],
+                'nama': sales_req['product_name'],
+                # 'kategori': product['category'],
+                'tanggal': datetime.today(),
+                'suplier_id':str(user_log['_id']),
+            })
+
+            sales_request.delete_one(
+                {'_id': ObjectId(request_id)}
+            )
+
             if product:
                 sales_product.update_one(
                     {'_id': ObjectId(product_hist['product_id'])},

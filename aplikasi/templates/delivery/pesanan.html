@@ -32,18 +32,29 @@
                         
                 {% endif %}
                 <strong>Order ID:</strong> {{ request.order_id }}<br>
+                <strong>Status:</strong> {{ request.status }}<br>
                 <strong>Order Date:</strong> {{ request.date }}<br>
-                <!-- <form action="{% url 'remove/' %}" method="post">
+
+                {% if request.status == 'pending' %}
+                <form action="{% url 'accept_delivery/' %}" method="post">
                     {% csrf_token %}
-                    <input type="hidden" name="selected_product_id" value="{{ item.product_id }}">
+                    <input type="hidden" name="selected_request_id" value="{{ request.order_id }}">
                     <input type="hidden" name="selected_user_id" value="{{ item.user_id }}">
                     <input type="hidden" name="selected_quantity" value="{{ item.kuantitas }}">
                     <input type="hidden" name="selected_price" value="{{ item.harga }}">
                     <input type="hidden" name="selected_category" value="{{ item.kategori }}">
                     <input type="hidden" name="selected_name" value="{{ item.nama }}">
-                    <button type="submit" class="text-red-500">Remove</button>
+                    <button type="submit" class="text-red-500">Accept</button>
                 </form>
-                <div class="w-full h-0.5 bg-black"></div> -->
+                {% endif %}
+                {% if request.status == 'accept' %}
+                <form action="{% url 'accept_delivery/' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="selected_request_id" value="{{ request.order_id }}">
+                    <button type="submit" class="text-red-500">Delivered</button>
+                </form>
+                {% endif %}
+                <div class="w-full h-0.5 bg-black"></div>
             </li>
             {% empty %}
             <li>No items in your cart</li>

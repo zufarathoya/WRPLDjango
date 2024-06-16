@@ -26,7 +26,9 @@ urlpatterns = [
     path('order_confirmation/', checkout.orderConfirmation, name='order_confirmation/'),
     path('gudang_show/', tambah_stok.show_product, name='gudang_show/'),
     path('gudang_add_stock/', tambah_stok.addStock, name='gudang_add_stock/'),
+    path('gudang_add_product/', tambah_stok.add_product, name='gudang_add_product/'),
     path('tambah_stok/', tambah_stok.show_add_stock, name='tambah_stok/'),
+    path('product_history/', tambah_stok.product_history, name='product_history/'),
     path('tambah_produk/', tambah_stok.tambah_produk, name='tambah_produk/'),
     path('permintaan_toko/', tambah_stok.sales_request_, name='permintaan_toko/'),
     path('accept_request/', tambah_stok.accept_request, name='accept_request/'),
@@ -38,4 +40,5 @@ urlpatterns = [
     path('sales_history/', toko.sell_history, name='sales_history/'),
     path('delivery/', jalur.delivery, name='delivery/'),
     path('delivery_req/', delivery.show_request, name='delivery_req/'),
+    path('accept_delivery/', delivery.accept_delivery, name='accept_delivery/'),
 ]

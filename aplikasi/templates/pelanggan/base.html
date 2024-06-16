@@ -20,7 +20,7 @@
                 <li class="mb-2"><a href="{% url 'buyer_history/' %}" class="block py-2 px-4 hover:bg-gray-700">History</a></li>
             </ul>
             <p> {{ user_name }}</p> <br>
-            <a href="{% url 'logout/' %}">LogOut</a>
+            <a class="bg-red-500 p-2 rounded" href="{% url 'logout/' %}">LogOut</a>
         </div>
         <!-- Content -->
         <div class="flex-1 overflow-y-auto p-4">
