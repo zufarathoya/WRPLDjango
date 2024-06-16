@@ -26,6 +26,8 @@ def show_request(request):
     # Avoid reusing the variable name 'request' inside the loop
     for req in requests:
         req['id'] = req['_id']
+    
+    requests.sort(key=lambda req: req['date'], reverse=True)
 
     context = {
         'requests': requests,

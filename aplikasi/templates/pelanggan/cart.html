@@ -50,7 +50,7 @@
 
     <div class="mt-4 flex justify-between">
         <a href="{% url 'buy/' %}" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">Continue Shopping</a>
-        <form action="{% url 'checkout/' %}" method="post">
+        <form action="{% url 'lokasi/' %}" method="post">
             <p type="hidden" name="_user_id" value="{{ item.user_id }}"></p>
             <p type="hidden" name="total_harga" value="{{ total_harga_keranjang }}"></p>
             {% csrf_token %}

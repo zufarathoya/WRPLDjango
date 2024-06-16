@@ -3,7 +3,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.urls import reverse
 from .models import cart_collection, product_collection, delivery_req, \
-    history_purchase, user_collection, purchase, sales_product, sales_history
+    history_purchase, user_collection, purchase, sales_product, sales_history, \
+    BankAccount
 from bson import ObjectId
 from datetime import datetime
 from midtransclient import Snap
@@ -16,7 +17,7 @@ def checkout(request):
     if request.method == 'POST':
         # selected_user_id = request.POST.get('_user_id')
         # total_price = request.POST.get('total_harga')
-
+        location = request.POST.get('location')
         user_id_ = user_collection.find_one({'is_login':True})
         user_id_ = user_id_['_id']
         print(user_id_)
@@ -51,15 +52,33 @@ def checkout(request):
                 sales_product.update_one({'_id': ObjectId(product_id)}, {'$set': {'stok': new_quantity}})
         # cart_items = list(cart_items)
         # for cart_item in cart_items:
+        delivery_price = 0
+        if str(location).lower() == 'jakarta':
+            delivery_price = 20000
+        elif str(location).lower() == 'semarang':
+            delivery_price = 10000
+        elif str(location).lower() == 'surabaya':
+            delivery_price = 15000
+
         order_history = {
             'user_id': str(user_id_),
             'items': cart_items,
             'total_price': sum(item['total_harga_produk'] for item in cart_items),
             # 'total_price' : total_price,
             'order_date': datetime.today(),
-            'status': 'pending'
-
+            'status': 'pending',
+            'location': location,
+            'ongkir':delivery_price,
         }
+
+        BankAccount.update_one(
+            {'user_id':str(user_id_)},
+            {
+                '$inc': {
+                    'saldo':-(int(sum(item['total_harga_produk'] for item in cart_items)) + delivery_price)
+                    }
+                }
+            )
 
         purchase.insert_one(order_history)
 
@@ -79,6 +98,7 @@ def checkout(request):
             'item': cart_items,
             'status': 'pending',
             'date': datetime.today(),
+            'ongkir': delivery_price
         })
 
         order_dict = {
@@ -86,10 +106,11 @@ def checkout(request):
             'user_id': user_id_,
             'total_price': sum(item['total_harga_produk'] for item in cart_items),
             'order_date': datetime.today(),
+            'ongkir': delivery_price
         }
         
         redirect_url = create_transaction(request, order_dict)
-        # Hapus semua produk dari keranjang untuk user yang sedang login
+
         cart_collection.delete_many({'user_id': str(user_id_)})
 
         return redirect(redirect_url)  # Ganti 'order_confirmation' dengan URL yang sesuai

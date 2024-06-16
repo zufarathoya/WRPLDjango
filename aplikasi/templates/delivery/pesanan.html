@@ -34,6 +34,7 @@
                 <strong>Order ID:</strong> {{ request.order_id }}<br>
                 <strong>Status:</strong> {{ request.status }}<br>
                 <strong>Order Date:</strong> {{ request.date }}<br>
+                <strong>Shipping Price:</strong> {{ request.ongkir }}<br>
 
                 {% if request.status == 'pending' %}
                 <form action="{% url 'accept_delivery/' %}" method="post">

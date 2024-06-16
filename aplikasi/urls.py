@@ -18,6 +18,7 @@ urlpatterns = [
     path('delivery/', jalur.delivery, name='delivery/'),
     path('buy_product/<str:product_id>/', jalur.buy_product, name='buy_product/'),
     path('buyer_history/', jalur.buyer_history, name='buyer_history/'),
+    path('lokasi/', jalur.location, name='lokasi/'),
     # path('buy_product/', views.buy_product, name='buy_product'),
     path('cart/', cart.add_to_cart, name='cart/'),
     path('show_cart/', cart.cart_view, name='show_cart/'),

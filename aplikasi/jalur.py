@@ -99,13 +99,24 @@ def buyer_history(request):
     daftar = history_purchase.find({'user_id': str(user_log['_id'])})
     daftar = list(daftar)
     
-    # total_harga_keranjang = 0
-    # for item in daftar:
-    #     total_harga_keranjang += item['total_harga_produk']
-    
+    for item in daftar:
+        item['total'] = item['total_price'] + item['ongkir']
+        
     context = {
         'daftar': daftar,
         # 'total_harga_keranjang': total_harga_keranjang
     }
     
     return render(request, 'pelanggan/history_pesanan.html', context)
+
+def location(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'pelanggan':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+    
+    total_harga = request.POST.get('total_harga')
+    context = {
+        'total_harga': total_harga
+    }
+    return render(request, 'pelanggan/lokasi_pengiriman.html', {})

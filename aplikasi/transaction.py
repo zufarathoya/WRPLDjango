@@ -1,3 +1,4 @@
+import uuid
 from django.shortcuts import redirect
 from midtransclient import Snap
 from .models import TopUpHistory, BankAccount
@@ -24,8 +25,9 @@ def create_transaction(request, order_dict):
 
     param = {
         "transaction_details": {
-            "order_id": order_dict['order_id'],
-            "gross_amount": order_dict['total_price'],
+            # "order_id": order_dict['order_id'],
+            "order_id": str(uuid.uuid4()),
+            "gross_amount": order_dict['total_price'] + order_dict['ongkir'],
         },
         "credit_card":{
             "secure" : True
