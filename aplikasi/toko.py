@@ -2,7 +2,8 @@ import datetime
 from bson import ObjectId
 from django.shortcuts import render, redirect
 from .models import product_collection, user_collection, cart_collection, \
-    supplier_product, sales_request, history_request, sales_product, sales_history
+    supplier_product, sales_request, history_request, sales_product, sales_history, \
+    delivery_req
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
@@ -149,3 +150,37 @@ def sell_history(request):
     }
 
     return render(request, 'toko/sales_history.html', context)
+
+def status_pengiriman(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'toko':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+    
+    req = delivery_req.find({'sales_id':str(user_log['_id'])})
+    req = list(req)
+    barang = {}
+
+    requ = delivery_req.find()
+    for r in requ:
+        # Check if 'item' key exists and is not None
+        if 'item' in r and r['item'] is not None and len(r['item']) > 0:
+            # Iterate through all items in the 'item' list
+            for barangs in r['item']:
+                # Check if the 'sales_id' matches 'user_log' '_id'
+                if barangs['sales_id'] == str(user_log['_id']):
+                    # Store the item in the 'barang' dictionary with 'order_id' as the key
+                    barang[r['order_id']] = {
+                        'barangs': barangs,
+                        'date': r['date'],
+                        'status': r['status']
+                    }
+
+    req.sort(key=lambda r: r['date'], reverse=True)
+
+    context = {
+        'requests': req,
+        'barangs': barang,
+    }
+
+    return render(request, 'toko/status.html', context)

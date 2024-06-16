@@ -1,7 +1,8 @@
 import datetime
 from bson import ObjectId
 from django.shortcuts import render, redirect
-from .models import product_collection, user_collection, cart_collection, delivery_req
+from .models import product_collection, user_collection, cart_collection, delivery_req, sales_product, \
+    history_request, sales_request, supplier_product   
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
@@ -64,6 +65,30 @@ def accept_delivery(request):
                 delivery_req.update_one({'order_id': str(selected_id)}, {
                     '$set': {'status': 'done'}
                 })
+            elif delivery['status'] == 'done':
+                product_hist = history_request.find_one({'request_id': str(delivery['order_id'])})
+
+                sales_req = sales_request.find_one({'_id': ObjectId(delivery['order_id'])})
+                product = sales_product.find_one({'_id':ObjectId(sales_req['product_id'])})
+                if product:
+                    sales_product.update_one(
+                        {'_id': ObjectId(product_hist['product_id'])},
+                        {'$inc': {'stok': product_hist['quantity']}}
+                    )
+            else:
+                from_supp = supplier_product.find_one({'_id':ObjectId(product_hist['product_id'])})
+                update = {
+                    '_id': ObjectId(from_supp['_id']),
+                    'merek': from_supp['merek'],
+                    'kategori': from_supp['kategori'],
+                    'deskripsi': from_supp['deskripsi'],
+                    'harga': int(from_supp['harga']),
+                    'nama': product_hist['product_name'],
+                    'sales_id': product_hist['sales_id'],
+                    'stok': product_hist['quantity'],
+                    'date': product_hist['date'],
+                }
+                sales_product.insert_one(update)
 
             messages.success(request, 'Delivery has been accepted successfully.')
             return redirect(reverse('delivery_req/'))

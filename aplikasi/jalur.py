@@ -1,6 +1,6 @@
 from bson import ObjectId
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import product_collection, user_collection, sales_product, history_purchase
+from .models import product_collection, user_collection, sales_product, history_purchase, delivery_req
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
@@ -120,3 +120,20 @@ def location(request):
         'total_harga': total_harga
     }
     return render(request, 'pelanggan/lokasi_pengiriman.html', {})
+
+def status_pengiriman(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'pelanggan':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+    
+    req = delivery_req.find({'user_id':str(user_log['_id'])})
+    req = list(req)
+    
+    req.sort(key=lambda r: r['date'], reverse=True)
+
+    context = {
+        'requests': req
+    }
+
+    return render(request, 'pelanggan/status_pengiriman.html', context)

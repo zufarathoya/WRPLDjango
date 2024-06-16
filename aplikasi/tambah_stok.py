@@ -247,6 +247,7 @@ def accept_request(request):
                 {'$inc': {'stok': -product_hist['quantity']}}
             )
             supplier_product_history.insert_one({
+                'request_id': sales_req['_id'],
                 'tipe': 'Send to Sales',
                 'product_id': sales_req['product_id'],
                 'kuantitas': sales_req['quantity'],
@@ -260,26 +261,43 @@ def accept_request(request):
                 {'_id': ObjectId(request_id)}
             )
 
-            if product:
-                sales_product.update_one(
-                    {'_id': ObjectId(product_hist['product_id'])},
-                    {'$inc': {'stok': product_hist['quantity']}}
-                )
-            else:
-                from_supp = supplier_product.find_one({'_id':ObjectId(product_hist['product_id'])})
-                update = {
-                    '_id': ObjectId(from_supp['_id']),
-                    'merek': from_supp['merek'],
-                    'kategori': from_supp['kategori'],
-                    'deskripsi': from_supp['deskripsi'],
-                    'harga': int(from_supp['harga']),
-                    'nama': product_hist['product_name'],
-                    'sales_id': product_hist['sales_id'],
-                    'stok': product_hist['quantity'],
-                    'date': product_hist['date'],
-                }
-                sales_product.insert_one(update)
+            # if product:
+            #     sales_product.update_one(
+            #         {'_id': ObjectId(product_hist['product_id'])},
+            #         {'$inc': {'stok': product_hist['quantity']}}
+            #     )
+            # else:
+            #     from_supp = supplier_product.find_one({'_id':ObjectId(product_hist['product_id'])})
+            #     update = {
+            #         '_id': ObjectId(from_supp['_id']),
+            #         'merek': from_supp['merek'],
+            #         'kategori': from_supp['kategori'],
+            #         'deskripsi': from_supp['deskripsi'],
+            #         'harga': int(from_supp['harga']),
+            #         'nama': product_hist['product_name'],
+            #         'sales_id': product_hist['sales_id'],
+            #         'stok': product_hist['quantity'],
+            #         'date': product_hist['date'],
+            #     }
+            #     sales_product.insert_one(update)
         else:
             messages.error(request, 'Invalid request ID.')
     
     return redirect(reverse('permintaan_toko/'))
+
+def status_pengiriman(request):
+    user_log = user_collection.find_one({'is_login':True})
+    if not user_log or user_log['category'] != 'gudang':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect(reverse('login/'))
+    
+    req = delivery_req.find({'suplier_id':str(user_log['_id'])})
+    req = list(req)
+
+    req.sort(key=lambda r: r['date'], reverse=True)
+
+    context = {
+        'requests': req,
+    }
+
+    return render(request, 'gudang/status.html', context)

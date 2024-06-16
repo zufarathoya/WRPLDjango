@@ -1,0 +1,35 @@
+{% extends "gudang/base.html" %}
+
+{% block title %}Product List{% endblock %}
+
+{% block content %}
+
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Delivery Status</h1>
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <h2 class="text-lg font-semibold mb-2">Status</h2>
+        <ul>
+            <div class="w-full h-0.5 bg-black"></div>
+            {% for request in requests %}
+            <li>
+                <div class="w-full h-0.5 bg-black"></div>
+                {% if request.quantity %}
+                    <strong>Name:</strong> {{ request.product_name }}<br>
+                    <strong>Quantity:</strong> {{ request.quantity }}<br>
+                    <strong>Toko:</strong> {{ request.sales_id }}<br>
+                    <strong>Gudang:</strong> {{ request.suplier_id }}<br>
+                    <strong>Toko:</strong> {{ request.sales_id }}<br>
+                {% endif %}
+                <strong>Order ID:</strong> {{ request.order_id }}<br>
+                <strong>Status:</strong> {{ request.status }}<br>
+                <strong>Order Date:</strong> {{ request.date }}<br>
+                <div class="w-full h-0.5 bg-black"></div>
+            </li>
+            {% empty %}
+            <li>No items in your cart</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}
