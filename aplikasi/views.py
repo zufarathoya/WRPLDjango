@@ -70,7 +70,7 @@ def login_view(request):
         user = user_collection.find_one({'username':username, 'password':password})
         # log = authenticate(request, username=username, password=password)
 
-        if (user) and username or password:
+        if user:
             user_collection.update_many(
                 {},
                 {
@@ -104,28 +104,38 @@ def login_view(request):
 
 def register_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
-        email = request.POST['email']
-        chekUser = user_collection.find_one({'username':username})
+        username = request.POST['username'].strip()
+        password1 = request.POST['password1'].strip()
+        password2 = request.POST['password2'].strip()
+        email = request.POST['email'].strip()
+
+        # Check if any field is empty
+        if not username or not password1 or not password2:
+            messages.error(request, 'Username and passwords are required')
+            return render(request, 'autentikasi/register.html', {})
+        
+        # Check if username already exists
+        chekUser = user_collection.find_one({'username': username})
         if chekUser:
             messages.error(request, 'Username already exists')
             return render(request, 'autentikasi/register.html', {})
-        elif password1 != password2:
-            messages.error(request, 'Password not match')
-            return render(request, 'autentikasi/register.html', {})
-        else:
-            user = {
-                'email' : email,
-                'username': username,
-                'password': password1,
-                'category': 'pelanggan',
-                'is_login': False,
-            }
-            user_collection.insert_one(user)
-            return redirect(reverse('login/'))
         
+        # Check if passwords match
+        if password1 != password2:
+            messages.error(request, 'Passwords do not match')
+            return render(request, 'autentikasi/register.html', {})
+        
+        # Insert new user into the database
+        user = {
+            'email': email,
+            'username': username,
+            'password': password1,
+            'category': 'pelanggan',
+            'is_login': False,
+        }
+        user_collection.insert_one(user)
+        return redirect(reverse('login'))
+    
     return render(request, 'autentikasi/register.html', {})
 
 def logout_view(request):

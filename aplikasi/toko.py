@@ -3,7 +3,7 @@ from bson import ObjectId
 from django.shortcuts import render, redirect
 from .models import product_collection, user_collection, cart_collection, \
     supplier_product, sales_request, history_request, sales_product, sales_history, \
-    delivery_req
+    delivery_req, BankAccount
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
@@ -21,10 +21,15 @@ def show_product(request):
     selected_category = request.GET.get('kategori', '')
 
     if selected_category:
-        products = sales_product.find({'kategori': selected_category, 'sales_id':str(user_log['_id'])})
+        products = sales_product.find({
+            'kategori': selected_category,
+            'sales_id':str(user_log['_id'])
+        })
         products = list(products)
     else:
-        products = sales_product.find()
+        products = sales_product.find({
+            'sales_id':str(user_log['_id'])
+        })
         products = list(products)
 
     for product in products:
@@ -70,6 +75,7 @@ def action_request(request):
             'product_id': str(product['_id']),
             'product_name': str(product['nama']),
             'suplier_id': str(product['suplier_id']),
+            'total harga': quantity * int(product['harga']),
             'quantity': quantity,
             'category': str(product['kategori']),
             'sales_id': str(user_log['_id']),
@@ -77,6 +83,21 @@ def action_request(request):
             'date': datetime.datetime.today(),
         }
         
+        saldo = BankAccount.find_one({
+            'user_id': str(user_log['_id'])
+        })
+
+        if saldo['saldo'] < record['total harga']:
+            messages.error(request, 'Insufficient balance.')
+            return redirect(reverse('show_product/'))
+
+        BankAccount.update_one({
+            'user_id': str(user_log['_id'])
+        },
+        {
+            '$inc': {'saldo': -record['total harga']}
+        })
+
         sales_request.insert_one(record)
 
         sales_hist = sales_request.find_one({'product_id': str(product['_id'])})
@@ -123,6 +144,8 @@ def show_all_request(request):
 
     reqs = history_request.find({'sales_id': str(user_log['_id'])})
     reqs = list(reqs)
+
+    reqs.sort(key=lambda r: r['date'], reverse=True)
 
     for req in reqs:
         req['id'] = req['_id']

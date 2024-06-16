@@ -76,8 +76,10 @@ def add_to_cart(request):
                 'daftar': daftar,
                 'total_harga_keranjang': total_harga_keranjang,
                 'message': message,
+                'added': added,
             }
-            
+            added = False
+            messages.success(request, 'Product added to cart.')
             # Render halaman cart.html dengan konteks yang telah dibuat
             return render(request, 'pelanggan/buy_product.html', context)
             

@@ -1,11 +1,12 @@
 import datetime
 from bson import ObjectId
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import product_collection, user_collection, sales_request, \
+from .models import user_collection, sales_request, \
             history_request, sales_product, supplier_product, delivery_req, supplier_product_history
 from django.contrib import messages
 from django.urls import reverse
 from  datetime import datetime
+from .gudang import tolak
 
 def addStock(request):
     user_log = user_collection.find_one({'is_login':True})
@@ -19,14 +20,18 @@ def addStock(request):
 
         # Find the product based on the ID
         # product = product_collection.find_one({'_id': ObjectId(selected_id)})
-        product = supplier_product.find_one({'name': selected_id})
+        product = supplier_product.find_one({
+            'nama': selected_id, 'suplier_id':str(user_log['_id'])
+        })
 
         if product:
             # Update the product's stock
             # product_collection.update_one({'_id': ObjectId(selected_id)}, {
             #     '$inc': {'stok': stock}
             # })
-            supplier_product.update_one({'name': selected_id}, {
+            supplier_product.update_one({
+                'nama': selected_id, 'suplier_id':str(user_log['_id']) }
+                , {
                 '$inc': {'stok': stock}
             })
 
@@ -100,7 +105,7 @@ def show_product(request):
         products = supplier_product.find({'kategori': selected_category, 'suplier_id':str(user_log['_id'])})
         products = list(products)
     else:
-        products = supplier_product.find()
+        products = supplier_product.find({'suplier_id':str(user_log['_id'])})
         products = list(products)
 
     for product in products:
@@ -124,6 +129,9 @@ def product_history(request):
     product = list(product)
     for prod in product:
         prod['id'] = prod['_id']
+
+    product.sort(key=lambda r: r['tanggal'], reverse=True)
+
     context = {
         'items': product,
     }
@@ -136,15 +144,19 @@ def show_add_stock(request):
         messages.error(request, 'You do not have permission to access this page.')
         return redirect(reverse('login/'))
     
-    products_names = product_collection.distinct('nama')
+    supplier_product_name = supplier_product.find({'suplier_id':str(user_log['_id'])})
+    products_names = supplier_product_name.distinct('nama')
     products_names = list(products_names)
     selected_product = request.GET.get('product', '')
     if selected_product:
-        products = product_collection.find_one({'nama': selected_product})
+        products = supplier_product.find_one({
+            'nama': selected_product, 
+            'suplier_id':str(user_log['_id'])
+        })
         # products = products[0]
 
     else:
-        products = product_collection.find_one()
+        products = supplier_product.find_one()
         # products = products[0]
 
     products["id"] = products["_id"]
@@ -170,7 +182,7 @@ def tambah_produk(request):
         stok = request.POST.get('stok')
         deskripsi = request.POST.get('deskripsi')
 
-        chek = product_collection.find({'nama':nama})
+        chek = supplier_product.find({'nama':nama})
         chek = list(chek)
         if chek:
             messages.error(request, 'Product already exists.')
@@ -184,7 +196,7 @@ def tambah_produk(request):
             'deskripsi': deskripsi,
         }
 
-        product_collection.insert_one(product)
+        supplier_product.insert_one(product)
 
         messages.success(request, 'Product added successfully.')
         return redirect(reverse('gudang_show/'))
@@ -215,6 +227,12 @@ def accept_request(request):
     
     if request.method == 'POST':
         request_id = request.POST.get('acc')
+
+        deny = request.POST.get('deny')
+        if deny:
+            tolak(request)
+            return redirect(reverse('permintaan_toko/'))
+
         if request_id:
             history_request.update_one(
                 {'request_id': request_id},

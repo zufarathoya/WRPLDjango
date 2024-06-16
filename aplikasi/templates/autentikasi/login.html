@@ -7,10 +7,16 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
+{% if messages %}
+<div>
+    {% for message in messages %}
+        <div class="mb-4 p-4 {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
 <body class="bg-gray-100 h-screen flex items-center justify-center">
-    {% if mesaage %}
-        <p>{{ message }}</p>
-    {% endif %}
     <div class="max-w-md w-full bg-white p-8 rounded shadow-md">
         <h1 class="text-4xl font-bold mb-8 float-center">Beauty Heaven</h1>
         <h2 class="text-2xl font-bold mb-8">Login</h2>
