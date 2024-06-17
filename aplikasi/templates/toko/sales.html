@@ -1,4 +1,4 @@
-{% extends "gudang/base.html" %}
+{% extends "toko/base.html" %}
 
 {% block title %}Product List{% endblock %}
 
@@ -20,21 +20,22 @@
         <h2 class="text-lg font-semibold mb-2">Requests</h2>
         <ul>
             <div class="w-full h-0.5 bg-black"></div>
-            {% for request in requests %}
+            {% for request in products %}
             <li>
-                <form method="post" action="{% url 'accept_request/' %}" class="mb-4">
+                <form method="post" action="{% url 'terima_pesanan/' %}" class="mb-4">
                     {% csrf_token %}
                     <div class="p-2 bg-gray-100 rounded">
-                        <strong>Product Name:</strong> {{ request.product_name }}<br>
+                        <strong>Product ID:</strong> {{ request.order_id }}<br>
+                        <strong>Product Name:</strong> {{ request.name }}<br>
                         <strong>Quantity:</strong> {{ request.quantity }}<br>
                         <strong>Category:</strong> {{ request.category }}<br>
                         <strong>Status:</strong> {{ request.status }}<br>
-                        <strong>Date:</strong> {{ request.date }}<br>
+                        <strong>Date:</strong> {{ request.order_date }}<br>
                         <div class="flex space-x-2 mt-2">
-                            <button value="{{ request.id }}" name="deny" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700">
+                            <button value="{{ request.order_id }}" name="reject" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700">
                                 Deny
                             </button>
-                            <button value="{{ request.id }}" name="acc" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
+                            <button value="{{ request.order_id }}" name="acc" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
                                 Accept
                             </button>
                         </div>

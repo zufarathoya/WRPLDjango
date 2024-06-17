@@ -1,0 +1,54 @@
+{% extends "delivery/base.html" %}
+
+{% block title %}Product List{% endblock %}
+
+{% block content %}
+
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Request List</h1>
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <h2 class="text-lg font-semibold mb-2">Request</h2>
+        <ul>
+            <div class="w-full h-0.5 bg-black"></div>
+            {% for request in requests %}
+            <li>
+                <div class="w-full h-0.5 bg-black"></div>
+                <!-- <strong>Name:</strong> {{ item.items }}<br> -->
+                <!-- <ul>
+                    <li class="pl-7">
+                        {% for barang in request.item %}  
+                        <strong>Name:</strong> {{ barang.nama }}<br>
+                        <strong>Quantity:</strong> {{ barang.kuantitas }}<br>
+                        <strong>Category:</strong> {{ barang.kategori }}<br>                    
+                        {% endfor %}
+                    </li>
+                </ul> -->
+                {% if request.quantity %}
+                    <strong>Name:</strong> {{ request.product_name }}<br>
+                    <strong>Quantity:</strong> {{ request.quantity }}<br>
+                    <strong>Toko:</strong> {{ request.sales_id }}<br>
+                    <strong>Gudang:</strong> {{ request.suplier_id }}<br>
+                    <strong>Toko:</strong> {{ request.sales_id }}<br>
+                        
+                {% endif %}
+                <strong>Order ID:</strong> {{ request.order_id }}<br>
+                <strong>Status:</strong> {{ request.status }}<br>
+                <strong>Order Date:</strong> {{ request.date }}<br>
+                <strong>Shipping Price:</strong> {{ request.ongkir }}<br>
+                <strong>Shipping Location:</strong> {{ request.location }}<br>
+                    {% csrf_token %}
+                    <input type="hidden" name="selected_request_id" value="{{ request.order_id }}">
+                    <input type="hidden" name="selected_user_id" value="{{ item.user_id }}">
+                    <input type="hidden" name="selected_quantity" value="{{ item.kuantitas }}">
+                    <input type="hidden" name="selected_price" value="{{ item.harga }}">
+                    <input type="hidden" name="selected_category" value="{{ item.kategori }}">
+                    <input type="hidden" name="selected_name" value="{{ item.nama }}">
+            </li>
+            {% empty %}
+            <li>No items in your cart</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

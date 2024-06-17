@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views, jalur, cart, checkout, tambah_stok, toko, delivery, gudang
+from . import views, jalur, cart, checkout, tambah_stok, toko, delivery, gudang, toko2
 
 urlpatterns = [
     path('', views.index),
@@ -7,10 +7,10 @@ urlpatterns = [
     path('show/', views.showProduct, name='show/'),
     path('showUser/', views.showUser, name='showUser/'),
     path('login/', views.login_view, name='login/'),
-    path('register/', views.register_view, name='register'),
+    path('register/', views.register_view, name='register/'),
     path('logout/', views.logout_view, name='logout/'),
     path('login_user/', views.login_view, name='login'),
-    path('register_user/', views.register_view, name='register/'),
+    path('register_user/', views.register_view, name='register'),
     path('pelanggan/', jalur.pelanggan, name='pelanggan/'),
     path('buy/', jalur.buy, name='buy/'),
     path('toko/', jalur.toko, name='toko/'),
@@ -43,7 +43,10 @@ urlpatterns = [
     path('request_history/', toko.show_all_request, name='request_history/'),
     path('sales_history/', toko.sell_history, name='sales_history/'),
     path('status_product_toko/', toko.status_pengiriman, name='status_product_toko/'),
+    path('sales/', toko2.req_pelanggan, name='sales/'),
+    path('terima_pesanan/', toko2.terima, name='terima_pesanan/'),
     path('delivery/', jalur.delivery, name='delivery/'),
     path('delivery_req/', delivery.show_request, name='delivery_req/'),
     path('accept_delivery/', delivery.accept_delivery, name='accept_delivery/'),
+    path('history_pesanan/', delivery.history_pesanan, name='history_pesanan/'),
 ]

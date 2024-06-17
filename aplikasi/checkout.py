@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 # @login_required(login_url='login/')
 def checkout(request):
     if request.method == 'POST':
+        order_id = str(uuid.uuid4())
         # selected_user_id = request.POST.get('_user_id')
         # total_price = request.POST.get('total_harga')
         location = request.POST.get('location')
@@ -44,12 +45,13 @@ def checkout(request):
                     'user_id': str(user_id_),
                     'status': 'pending',
                     'payment_method': 'midtrans',
-                    'order_id': str(uuid.uuid4()),
-                    'order_date': datetime.today()
+                    'order_id': order_id,
+                    'order_date': datetime.today(),
+                    'location': location,
                 }
                 sales_history.insert_one(sales)
-                new_quantity = int(product['stok']) - cart_quantity
-                sales_product.update_one({'_id': ObjectId(product_id)}, {'$set': {'stok': new_quantity}})
+                # new_quantity = int(product['stok']) - cart_quantity
+                # sales_product.update_one({'_id': ObjectId(product_id)}, {'$set': {'stok': new_quantity}})
         # cart_items = list(cart_items)
         # for cart_item in cart_items:
         delivery_price = 0
@@ -82,24 +84,24 @@ def checkout(request):
 
         purchase.insert_one(order_history)
 
-        # order = history_purchase.find_one({'user_id':str(user_id_)})
-        order = purchase.find_one({'user_id':str(user_id_)})
+        # # order = history_purchase.find_one({'user_id':str(user_id_)})
+        # order = purchase.find_one({'user_id':str(user_id_)})
 
-        order_id = order['_id']
-        order_history['order_id'] = order_id
+        # # order_id = order['_id']
+        # order_history['order_id'] = order_id
         
-        # sales_history.insert_one(order_history)
-        history_purchase.insert_one(order_history)
+        # # sales_history.insert_one(order_history)
+        # history_purchase.insert_one(order_history)
 
-        # purchase.delete_one({'user_id':str(user_id_)})
-        delivery_req.insert_one({
-            'user_id': str(user_id_),
-            'order_id': str(order_id),
-            'item': cart_items,
-            'status': 'pending',
-            'date': datetime.today(),
-            'ongkir': delivery_price
-        })
+        # # purchase.delete_one({'user_id':str(user_id_)})
+        # delivery_req.insert_one({
+        #     'user_id': str(user_id_),
+        #     'order_id': str(order_id),
+        #     'item': cart_items,
+        #     'status': 'pending',
+        #     'date': datetime.today(),
+        #     'ongkir': delivery_price
+        # })
 
         order_dict = {
             'order_id': str(order_id),

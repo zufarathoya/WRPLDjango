@@ -194,6 +194,7 @@ def tambah_produk(request):
             'harga': harga,
             'stok': stok,
             'deskripsi': deskripsi,
+            'suplier_id':str(user_log['_id']),
         }
 
         supplier_product.insert_one(product)

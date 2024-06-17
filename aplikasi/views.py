@@ -134,7 +134,7 @@ def register_view(request):
             'is_login': False,
         }
         user_collection.insert_one(user)
-        return redirect(reverse('login'))
+        return redirect(reverse('login/'))
     
     return render(request, 'autentikasi/register.html', {})
 

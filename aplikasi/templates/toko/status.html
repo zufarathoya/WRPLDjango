@@ -28,15 +28,13 @@
             {% empty %}
             <li>No items in your cart</li>
             {% endfor %}
-            {% for order_id, data in barangs.items %}
+            {% for barang in barangs %}
                 <li>
                     <div class="w-full h-0.5 bg-black"></div>
-                    <strong>Order ID:</strong> {{ order_id }}<br>
-                    <strong>Date:</strong> {{ data.date }}<br>
-                    <strong>Name:</strong> {{ data.barangs.nama }}<br>
-                    <strong>Quantity:</strong> {{ data.barangs.kuantitas }}<br>
-                    <strong>Category:</strong> {{ data.barangs.kategori }}<br>
-                    <strong>Status:</strong> {{ data.status }}<br>
+                    <strong>Order ID:</strong> {{ barang.order_id }}<br>
+                    <strong>Date:</strong> {{ barang.date }}<br>
+                    <strong>Status:</strong> {{ barang.status }}<br>
+                    <strong>Location:</strong> {{ barang.location }}<br>
                     <div class="w-full h-0.5 bg-black"></div>
                 </li>
             {% endfor %}

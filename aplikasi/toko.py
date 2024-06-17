@@ -165,6 +165,7 @@ def sell_history(request):
     reqs = sales_history.find({'sales_id': str(user_log['_id'])})
     reqs = list(reqs)
 
+    reqs.sort(key=lambda r: r['order_date'], reverse=True)
     for req in reqs:
         req['id'] = req['_id']
 
@@ -182,23 +183,26 @@ def status_pengiriman(request):
     
     req = delivery_req.find({'sales_id':str(user_log['_id'])})
     req = list(req)
-    barang = {}
+    # barang = {}
+    barang =  delivery_req.find()
+    barang = list(barang)
 
-    requ = delivery_req.find()
-    for r in requ:
-        # Check if 'item' key exists and is not None
-        if 'item' in r and r['item'] is not None and len(r['item']) > 0:
-            # Iterate through all items in the 'item' list
-            for barangs in r['item']:
-                # Check if the 'sales_id' matches 'user_log' '_id'
-                if barangs['sales_id'] == str(user_log['_id']):
-                    # Store the item in the 'barang' dictionary with 'order_id' as the key
-                    barang[r['order_id']] = {
-                        'barangs': barangs,
-                        'date': r['date'],
-                        'status': r['status']
-                    }
-
+    # requ = delivery_req.find()
+    # req = list(req)
+    # for r in requ:
+    #     # Check if 'item' key exists and is not None
+    #     if 'item' in r and r['item'] is not None and len(r['item']) > 0:
+    #         # Iterate through all items in the 'item' list
+    #         for barangs in r['item']:
+    #             # Check if the 'sales_id' matches 'user_log' '_id'
+    #             if barangs['sales_id'] == str(user_log['_id']):
+    #                 # Store the item in the 'barang' dictionary with 'order_id' as the key
+    #                 barang[r['order_id']] = {
+    #                     'barangs': barangs,
+    #                     'date': r['date'],
+    #                     'status': r['status']
+    #                 }
+    # requ.sort(key=lambda r: r['date'], reverse=True)
     req.sort(key=lambda r: r['date'], reverse=True)
 
     context = {

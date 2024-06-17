@@ -16,11 +16,11 @@
                 <!-- <strong>Name:</strong> {{ item.items }}<br> -->
                 <ul>
                     <li class="pl-7">
-                        {% for barang in request.item %}  
-                        <strong>Name:</strong> {{ barang.nama }}<br>
-                        <strong>Quantity:</strong> {{ barang.kuantitas }}<br>
-                        <strong>Category:</strong> {{ barang.kategori }}<br>                    
-                        {% endfor %}
+                        <!-- {% if request.item %} -->
+                        <strong>Name:</strong> {{ request.item.name }}<br>
+                        <strong>Quantity:</strong> {{ request.item.kuantitas }}<br>
+                        <strong>Category:</strong> {{ request.item.kategori }}<br>                    
+                        <!-- {% endif %} -->
                     </li>
                 </ul>
                 {% if request.quantity %}
@@ -35,7 +35,19 @@
                 <strong>Status:</strong> {{ request.status }}<br>
                 <strong>Order Date:</strong> {{ request.date }}<br>
                 <strong>Shipping Price:</strong> {{ request.ongkir }}<br>
-
+                {% if request.status == 'requested' %}
+                <form action="{% url 'accept_delivery/' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="selected_request_id" value="{{ request.order_id }}">
+                    <input type="hidden" name="selected_user_id" value="{{ item.user_id }}">
+                    <input type="hidden" name="selected_quantity" value="{{ item.kuantitas }}">
+                    <input type="hidden" name="selected_price" value="{{ item.harga }}">
+                    <input type="hidden" name="selected_category" value="{{ item.kategori }}">
+                    <input type="hidden" name="selected_name" value="{{ item.nama }}">
+                    <button type="submit" class="text-red-500" name="reject" value="{{ request.order_id }}">Reject</button>
+                    <button type="submit" class="text-green-500  ml-20" name="accept" value="{{ request.order_id }}">Accept</button>
+                </form>
+                {% endif %}
                 {% if request.status == 'pending' %}
                 <form action="{% url 'accept_delivery/' %}" method="post">
                     {% csrf_token %}
@@ -45,14 +57,16 @@
                     <input type="hidden" name="selected_price" value="{{ item.harga }}">
                     <input type="hidden" name="selected_category" value="{{ item.kategori }}">
                     <input type="hidden" name="selected_name" value="{{ item.nama }}">
-                    <button type="submit" class="text-red-500">Accept</button>
+                    <button type="submit" class="text-red-500" name="reject" value="{{ request.order_id }}">Reject</button>
+                    <button type="submit" class="text-green-500  ml-20" name="accept" value="{{ request.order_id }}">Accept</button>
                 </form>
                 {% endif %}
                 {% if request.status == 'accept' %}
                 <form action="{% url 'accept_delivery/' %}" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="selected_request_id" value="{{ request.order_id }}">
-                    <button type="submit" class="text-red-500">Delivered</button>
+                    <button type="submit" class="text-red-500" name="reject" value="{{ request.order_id }}">Reject</button>
+                    <button type="submit" class="text-green-500  ml-20" name="accept" value="{{ request.order_id }}">Delivered</button>
                 </form>
                 {% endif %}
                 <div class="w-full h-0.5 bg-black"></div>
