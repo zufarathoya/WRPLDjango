@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views, jalur, cart, checkout, tambah_stok, toko, delivery, gudang, toko2
+from . import views, jalur, cart, checkout, tambah_stok, toko, delivery, gudang, toko2, bank
 
 urlpatterns = [
     path('', views.index),
@@ -49,4 +49,6 @@ urlpatterns = [
     path('delivery_req/', delivery.show_request, name='delivery_req/'),
     path('accept_delivery/', delivery.accept_delivery, name='accept_delivery/'),
     path('history_pesanan/', delivery.history_pesanan, name='history_pesanan/'),
+    path('bank/', bank.bank, name='bank/'),
+    path('transaction_history/', bank.transaction_history, name='transaction_history/'),
 ]

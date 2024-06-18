@@ -2,7 +2,7 @@ import datetime
 from bson import ObjectId
 from django.shortcuts import render, redirect
 from .models import product_collection, user_collection, cart_collection, delivery_req, sales_product, \
-    history_request, sales_request, supplier_product   
+    history_request, sales_request, supplier_product
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout

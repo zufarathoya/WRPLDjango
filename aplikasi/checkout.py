@@ -88,10 +88,10 @@ def checkout(request):
         # order = purchase.find_one({'user_id':str(user_id_)})
 
         # # order_id = order['_id']
-        # order_history['order_id'] = order_id
+        order_history['order_id'] = order_id
         
         # # sales_history.insert_one(order_history)
-        # history_purchase.insert_one(order_history)
+        history_purchase.insert_one(order_history)
 
         # # purchase.delete_one({'user_id':str(user_id_)})
         # delivery_req.insert_one({

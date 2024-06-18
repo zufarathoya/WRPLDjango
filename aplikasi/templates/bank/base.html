@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>{% block title %}My Site{% endblock %}</title>
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-800 text-white p-4 flex-shrink-0">
+            <h2 class="text-2xl font-bold mb-4">Beauty Heaven</h2>
+            <ul>
+                <li class="mb-2"><a href="" class="block py-2 px-4 hover:bg-gray-700">Home</a></li>
+                <li class="mb-2"><a href="{% url 'transaction_history/' %}" class="block py-2 px-4 hover:bg-gray-700">Transaction History</a></li>
+            </ul>
+            <p>Admin Delivery</p> <br>
+            <a class="bg-red-500 p-2 rounded" href="{% url 'logout/' %}">LogOut</a>
+        </div>
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto p-4">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

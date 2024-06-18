@@ -96,6 +96,8 @@ def login_view(request):
                 return redirect(reverse('toko/'))
             elif user['category'] == 'delivery':
                 return redirect(reverse('delivery/'))
+            elif user['category'] == 'bank':
+                return redirect(reverse('bank/'))
         else:
             messages.error(request, 'Username or password is incorrect')
             return render(request, 'autentikasi/login.html', {})
