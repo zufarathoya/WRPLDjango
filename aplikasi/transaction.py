@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from midtransclient import Snap
 from .models import TopUpHistory, BankAccount
 from django.conf import settings
+from datetime import datetime
 
 def create_transaction(request, order_dict):
     # gross_amount = request.POST.get('gross_amount')
@@ -34,14 +35,16 @@ def create_transaction(request, order_dict):
         }
     }
 
-    transaction = snap.create_transaction(param)
-    print(transaction)
     insert_ = {
-        'bank_account': BankAccount.find_one({'user_id':order_dict['user_id']}),
+        # 'bank_account': BankAccount.find_one({'user_id':str(order_dict['user_id'])}),
         'transaction_type': 'P',
         'amount': order_dict['total_price'],
         'order_id': order_dict['order_id'],
-        'user_id': order_dict['user_id'],
+        'user_id': str(order_dict['user_id']),
+        'date': datetime.today(),
     }
     TopUpHistory.insert_one(insert_)
+
+    transaction = snap.create_transaction(param)
+    print(transaction)
     return transaction['redirect_url']

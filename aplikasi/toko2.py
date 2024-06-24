@@ -62,7 +62,8 @@ def terima(request):
                 product_hist = sales_history.find({'order_id': request_id})
                 # product_hist = dict(product_hist)
                 delivery_req.insert_one({
-                    'order_id': request_id,
+                    'user_id': str(product_hist_one['user_id']),
+                    'order_id': str(request_id),
                     # 'items': product_hist,
                     'status': 'pending',
                     'date': datetime.today(),
